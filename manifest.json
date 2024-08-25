@@ -1,0 +1,21 @@
+{
+    "name": "B64+ Encrypt",
+    "short_name": "B64+app",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#96a35d",
+    "icons": [
+      {
+        "src": "/B64app.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/B64app_512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  

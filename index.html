@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base64+ App</title>
+
+  <!-- iOS Web-App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Base64 App">
+
+  <!-- App Icons für verschiedene Größen -->
+  <link rel="apple-touch-icon" href="/B64app.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="B64app_152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="B64app_180.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="B64app_167.png">
+
+  <!-- Splash Screens für verschiedene Geräte und Ausrichtungen -->
+  <!--link rel="apple-touch-startup-image" href="/path/to/splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" -->
+  <!-- link rel="apple-touch-startup-image" href="/path/to/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" -->
+  <!-- Weitere Splash-Screens nach Bedarf hinzufügen -->
+
+  <!-- Manifest Datei für PWA Konfiguration -->
+  <link rel="manifest" href="/manifest.json">
+
+  <style>
+    :root {
+      --primary-bg: #000;
+      --secondary-bg: #96a35d;
+      --container-max-width: 1200px;
+      --mobile-padding: 10px;
+      --tablet-font-size: 16px;
+    }
+
+    body {
+      background-color: var(--primary-bg);
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: var(--container-max-width);
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--secondary-bg);
+    }
+
+    @media screen and (max-width: 600px) {
+      .container {
+        padding: var(--mobile-padding);
+      }
+    }
+
+    @media screen and (min-width: 601px) and (max-width: 900px) {
+      .container {
+        font-size: var(--tablet-font-size);
+      }
+    }
+
+    button {
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      background-color: #fff;
+      border-radius: 5px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent; /* iOS-Touch-Effekte entfernen */
+    }
+
+    button:active {
+      background-color: #ccc;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1> Simple Encryption Tool </h1>
+    <br> <br>
+    <button onclick="encrypt()">Nachricht verschlüsseln</button>
+    <br><br>
+    <button onclick="decrypt()">Verschlüsselte Nachricht entschlüsseln</button>
+    <br> <br> <br>
+    <p> Privacy included*</p>
+
+    <script>
+      (function() {
+        // Originale btoa und atob Methoden beibehalten
+        const originalBtoa = window.btoa;
+        const originalAtob = window.atob;
+
+        // Helferfunktion zum Tauschen der Stellen
+        function swapEvenOddPositions(str) {
+          let swapped = '';
+          for (let i = 0; i < str.length; i += 2) {
+            if (i + 1 < str.length) {
+              swapped += str.charAt(i + 1) + str.charAt(i);
+            } else {
+              swapped += str.charAt(i);
+            }
+          }
+          return swapped;
+        }
+
+        // Neue btoa Methode
+        window.btoa = function(input) {
+          // Original Base64-Kodierung
+          const base64 = originalBtoa(input);
+          // Tauschen der geraden und ungeraden Stellen
+          return swapEvenOddPositions(base64);
+        };
+
+        // Neue atob Methode
+        window.atob = function(input) {
+          // Zuerst die Stellen zurücktauschen
+          const swappedBack = swapEvenOddPositions(input);
+          // Dann Base64-Dekodierung
+          return originalAtob(swappedBack);
+        };
+      })();
+      
+      const errorText = "Keine Nachricht gefunden.";
+
+      const encrypt = () => {
+        const input = prompt("Bitte geben Sie Ihre Nachricht ein:");
+        input.trim() ? alert(window.btoa(input)) : alert(errorText);
+      };
+
+      const decrypt = () => {
+        const input = prompt("Bitte geben Sie die verschlüsselte Zeichenfolge ein:");
+        input.trim() ? alert(window.atob(input)) : alert(errorText);
+      };
+
+      // Add-to-Home-Screen Aufforderung
+      /* if (!window.matchMedia('(display-mode: standalone)').matches) {
+        setTimeout(() => {
+          alert("Fügen Sie diese App Ihrem Startbildschirm hinzu, um die beste Erfahrung zu erzielen.");
+        }, 3000);
+      }
+      */
+      // Service Worker Registrierung für Offline-Unterstützung
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch(error => {
+            console.error('Service Worker registration failed:', error);
+          });
+      }
+    </script>
+
+    <noscript>Dieser Browser unterstützt keine JavaScript-Funktionen.</noscript>
+  </div>
+</body>
+
+</html>
